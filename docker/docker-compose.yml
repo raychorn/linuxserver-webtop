@@ -1,0 +1,89 @@
+version: "3.8"
+
+networks:
+    dbnet:
+    appnet:
+  
+services:
+    database:
+        image: mongo:latest
+        volumes:
+            - ./etc/mongod.conf:/etc/mongod.conf
+            - ./mongodb/data/db/:/data/db/
+            - ./mongodb/data/log/:/var/log/mongodb/
+        env_file:
+            - .env
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+            MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+        ports:
+            - "27017:27017"
+        logging:
+            options:
+                max-size: 1g        
+        command: ["-f", "/etc/mongod.conf"]
+        networks:
+            - dbnet
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    cpus: '1.0'
+                    memory: 512M
+
+    master:
+        image: raychorn/ubuntu_focal_all_pythons:latest-3.9.5
+        restart: unless-stopped
+        volumes:
+            - ..:/securex/attack-inferencer/
+        depends_on:
+            - database
+        env_file:
+            - .env
+        environment:
+            WAIT_HOSTS: database:27017
+        entrypoint:
+            - /bin/bash
+        tty: true
+        stdin_open: true
+        #command: ["/securex/attack-inferencer/runserver.sh"]
+        logging:
+            options:
+                max-size: 1g        
+        deploy:
+            resources:
+                limits:
+                    cpus: '1.0'
+                    memory: 1000M
+        networks:
+            - dbnet
+            - appnet
+                
+    worker:
+        image: raychorn/ubuntu_focal_all_pythons:latest-3.9.5
+        restart: unless-stopped
+        volumes:
+            - ..:/securex/attack-inferencer/
+        depends_on:
+            - database
+        env_file:
+            - .env
+        environment:
+            WAIT_HOSTS: database:27017
+        entrypoint:
+            - /bin/bash
+        tty: true
+        stdin_open: true
+        #command: ["/securex/attack-inferencer/runserver.sh"]
+        logging:
+            options:
+                max-size: 1g        
+        deploy:
+            resources:
+                limits:
+                    cpus: '1.0'
+                    memory: 1000M
+        networks:
+            - dbnet
+            - appnet

@@ -1,0 +1,22 @@
+version: "2.1"
+services:
+    webtop:
+        image: ghcr.io/linuxserver/webtop:ubuntu-kde
+        container_name: webtop
+        privileged: true
+        environment:
+            - PUID=0
+            - PGID=0
+            - TZ=America/Denver
+        volumes:
+            - ./home:/config
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - 3000:3000
+        shm_size: "1gb"
+        deploy:
+            resources:
+                limits:
+                    cpus: '4.0'
+                    memory: 4096M
+        restart: unless-stopped
