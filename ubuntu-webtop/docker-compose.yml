@@ -1,7 +1,7 @@
 version: "2.1"
 services:
     webtop:
-        image: ghcr.io/linuxserver/webtop:ubuntu-kde
+        image: raychorn/linuxserver_webtop:ubuntu-kde #ghcr.io/linuxserver/webtop:ubuntu-kde
         container_name: webtop
         privileged: true
         environment:
@@ -10,6 +10,7 @@ services:
             - TZ=America/Denver
         volumes:
             - ./home:/config
+            - /home/raychorn/projects/securex.ai:/securex.ai
             - /var/run/docker.sock:/var/run/docker.sock
         ports:
             - 3000:3000
@@ -17,6 +18,6 @@ services:
         deploy:
             resources:
                 limits:
-                    cpus: '4.0'
-                    memory: 4096M
+                    cpus: '6.0'
+                    memory: 5120M
         restart: unless-stopped
