@@ -15,9 +15,5 @@ services:
         ports:
             - 3000:3000
         shm_size: "1gb"
-        deploy:
-            resources:
-                limits:
-                    cpus: '6.0'
-                    memory: 5120M
+        mem_limit: 4GB
         restart: unless-stopped
